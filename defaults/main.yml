@@ -3,7 +3,7 @@ just_ca_pub: false
 openssl_node_bit_length: 4096
 openssl_node_name: "{{ ansible_fqdn }}"
 openssl_node_expiration: 365
-openssl_node_ca_name: "test_ca_freedom_press"
+openssl_node_ca_name: "testca_freedom_press"
 openssl_node_ca_creds: "test_ca"
 
 openssl_node:
