@@ -1,0 +1,7 @@
+---
+
+- name: Install openssl dependencies
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: ["{{ openssl_node_pkgs }}"]

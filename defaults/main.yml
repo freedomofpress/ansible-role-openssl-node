@@ -1,0 +1,124 @@
+---
+just_ca_pub: false
+openssl_node_bit_length: 4096
+openssl_node_name: "{{ ansible_fqdn }}"
+openssl_node_expiration: 365
+openssl_node_ca_name: "test_ca_freedom_press"
+openssl_node_ca_creds: "test_ca"
+
+openssl_node:
+  name: "{{ openssl_node_name }}"
+  bit_length: "{{ openssl_node_bit_length }}"
+  pub_dst: /etc/ssl/certs
+  priv_dst: /etc/ssl/private
+  local_tmp: ./tmp
+
+openssl_node_pkgs:
+  - openssl
+
+openssl_node_ca:
+  use: default_ca_name
+
+ca_cert:
+  city: San Francisco
+  state: CA
+  country: US
+  org: Freedom of the Press Foundation
+  ou: DevOps
+  email: sysadmin@freedom.press
+
+# This is a NON-PRODUCTION Test CA utilized for testing purposes.
+# In production you should have these values stored in your ansible
+# vault. Password is `test_ca` for the encrypted private key below.
+certificate_authority:
+  testca_freedom_press:
+    pub: |
+      -----BEGIN CERTIFICATE-----
+      MIIFETCCAvmgAwIBAgIJAIweTY3u4VDvMA0GCSqGSIb3DQEBCwUAMB8xHTAbBgNV
+      BAMMFHRlc3RjYS5mcmVlZG9tLnByZXNzMB4XDTE2MTAxMjE3MTExNFoXDTI2MTAx
+      MDE3MTExNFowHzEdMBsGA1UEAwwUdGVzdGNhLmZyZWVkb20ucHJlc3MwggIiMA0G
+      CSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQDBvD1YAajvmd6ibL8JLkAZhvX3HdM9
+      ZKzlnrBTxxCUFDlXD8wBqW5OkGkKUWUaAxgAPJJIggowaD63EzWQVfAtFiUIQ3EW
+      EGV7zp2U8uTfjEmwQfSrvWE7QSo8f8a1PihBjtCxj9EQZZQ4sEyNgS0KJnwoLcc8
+      EEjotz43nXn3BIRw5QdJ/8Ac5+pVWuxN75PbtJWyZwKYgQtC9AZSORsj+oHr2k7G
+      Dj4YR3SGXhKw0oyWIFzLv20Zu0yKXs+hXrC16U+zFtqv2Y5/iJyKjnAkdM71yIl4
+      iN0dDHe9eFvp7++OoS7TfqLPqrID4vjn3w1pKYVaf46fzpqswmiq0o0aK7bRfcef
+      mAId7yFj7STMq6LwSJ/XqSeAjcODENQbfoHsyHuSEE6ob9qIFhvkSb9Tq2zNBnAU
+      a4Aws0B20JO4zQPHhCz2ug0FssJUFlkwH8yLdESN68ESTTilJBxI7SoRA52EWmz/
+      jGYSUbKpil7jxONrwjUzTLT8BsAKanph9F/u3Mp1grRoWmlRjiLS+A1z8MtGbjFw
+      +CcBYLlr8+h77pF+IkpeoS714gDckom955fKgIsTyuBCOAOVJzn9ogJ/WfmJKyOv
+      IjNZp3CWJQCifzpqegw3cROlJx80yc798Cl2wGMi3jdVZXeVj3AsbGSi7WR5Wqws
+      XVRiQOisetl7MQIDAQABo1AwTjAdBgNVHQ4EFgQUZutMZTZQ5RHah5qMOG9B+hF+
+      WxUwHwYDVR0jBBgwFoAUZutMZTZQ5RHah5qMOG9B+hF+WxUwDAYDVR0TBAUwAwEB
+      /zANBgkqhkiG9w0BAQsFAAOCAgEAlHeWIRDadG9/iPEH0/KSmLJkRAVURFgr3HsB
+      bg4y6kjKMu7cz81G9eNMJkkerclLZ9fSjTPxVy/D3ZMQbw6tpvnx9mKmOTXwIFsG
+      +MOetjy9ffx1QPAoHwqN5GNUj3D7U/c8ZDv+sOTBdVMpnmJW+3kLSTm6E0ho1+CU
+      /aLIYKjKoP7mLFrx6+eUeanirVhOBZ68JApiKnc6BGHJaIoL4wwom5msSWH5Eaw3
+      pqSZzZ5z3DtberP1Uej2KmJaPcqQrSEZVsbUa2Qqq3pVIiZUBRBTTMi75JlyIgZN
+      j6pSSV8DAybmFxKRfzb+B6DBTP0M4YcqaN227cdTXA4Gi6naLKTWUPSlTOSzD3DB
+      O4TLbXI6yRbbF4KhqoO12VI1ca9c9OB2PDQDMUgVFqhTm63653qdiLQaeuzyMXLi
+      C3jQYiOoiBzFM1DIbxDpK44YkDChZl0QHxa31lX+Ou5zNwiy1Fsc2frGz5OknzIM
+      QONdo5bThvMRevHjitF2jWmPecvrkMeXz9TOomcv2e/FjfVjD2g9sWWsx0d826mJ
+      qDsOxg4RZasMd0yAPhtKX1n5LFP5/HxbXGsQopJ9wkSl6PerE0mjgjaA1XAptlLu
+      eQX9UDNq1GY69hyHAXo99FHejH/KE1ipp07Ur2LsA8gtRJU8mFEiam3aqaHC/fa6
+      2/xr9w0=
+      -----END CERTIFICATE-----
+    private: |
+      -----BEGIN ENCRYPTED PRIVATE KEY-----
+      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
+      3iM=
+      -----END ENCRYPTED PRIVATE KEY-----
+
+ca_cert_sign:
+  ca_pub_key: "{{ certificate_authority[openssl_node_ca_name].pub }}"
+  ca_priv_key: "{{ certificate_authority[openssl_node_ca_name].private }}"

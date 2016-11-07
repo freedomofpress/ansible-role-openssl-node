@@ -1,0 +1,12 @@
+galaxy_info:
+  author: Michael Sheinberg
+  description: openssl node management with signed CA
+  company: Freedom of the Press Foundation
+  license: MIT
+
+  min_ansible_version: 2.0
+
+  platforms:
+  - name: GenericLinux
+    versions:
+    - any

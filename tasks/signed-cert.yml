@@ -1,0 +1,73 @@
+---
+- set_fact:
+    certconf_tmp: "{{ ansible_env.TMPDIR | default('/tmp') }}/openssl_node.cnf"
+    csr: "{{openssl_node.name}}-req.csr"
+    pub_key: "/tmp/{{openssl_node.name}}-pub.pem"
+
+- name: Spin out remote openssl conf
+  template:
+    src: openssl.cnf.j2
+    dest: "{{ certconf_tmp }}"
+
+- name: Ensure local tmp exists
+  local_action:
+    module: file
+    state: directory
+    path: "{{ openssl_node.local_tmp }}"
+  become: no
+
+- name: Spin out local openssl conf
+  fetch:
+    src: "{{ certconf_tmp }}"
+    dest: "{{ certconf_tmp }}"
+    flat: yes
+
+- name: Temporarily expand CA cert
+  local_action:
+    module: copy
+    content: "{{ ca_cert_sign[item] }}"
+    dest: "{{ openssl_node.local_tmp }}/{{ item }}"
+  become: no
+  with_items: ['ca_pub_key', 'ca_priv_key']
+  no_log: true
+
+- name: create CSR req
+  command: >
+    openssl req -new -nodes -out /tmp/{{ csr }}
+    -keyout {{privkey_dst}} -config {{ certconf_tmp }} -batch
+    -newkey rsa:{{ openssl_node.bit_length }}
+    -subj '/CN={{openssl_node.name}}'
+  args:
+    creates: "{{ privkey_dst }}"
+  register: create_csr
+
+- name: Pull back the CSR to local machine
+  fetch:
+    src: "/tmp/{{ csr }}"
+    dest: "{{ openssl_node.local_tmp}}/{{ csr }}"
+    flat: yes
+
+- name: sign csr
+  command: >
+    openssl x509 -req -in {{ openssl_node.local_tmp }}/{{ csr }}
+    -CA {{ openssl_node.local_tmp }}/ca_pub_key
+    -CAkey {{ openssl_node.local_tmp }}/ca_priv_key
+    -out {{ openssl_node.local_tmp }}/signed_pub
+    -set_serial {{ lookup('pipe', "date +'%s'") }}
+    -days {{ openssl_node_expiration }} -extensions v3_req
+    -extfile {{ certconf_tmp }} -passin pass:{{ openssl_node_ca_creds }}
+  delegate_to: localhost
+  args:
+    creates: "{{ openssl_node.local_tmp }}/signed_pub"
+  become: no
+  no_log: true
+
+- name: Copy over signed cert to destination
+  copy:
+    src: "{{ openssl_node.local_tmp }}/signed_pub"
+    dest: "{{ pubkey_dst }}"
+
+- name: Clean-up
+  shell: "shred -u -z {{ openssl_node.local_tmp }}/*"
+  delegate_to: localhost
+  become: no
