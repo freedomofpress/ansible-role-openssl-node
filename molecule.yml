@@ -1,0 +1,21 @@
+---
+ansible:
+  verbose: vv
+  diff: yes
+  config_file: ansible.cfg
+
+vagrant:
+  platforms:
+    - name: jessie64
+      box: debian/jessie64
+
+  providers:
+    - name: virtualbox
+      type: virtualbox
+      options:
+        memory: 512
+
+  instances:
+    - name: randomserver
+      ansible_groups:
+        - ssl
