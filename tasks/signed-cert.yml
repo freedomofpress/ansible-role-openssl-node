@@ -25,7 +25,7 @@
 - name: Temporarily expand CA cert
   local_action:
     module: copy
-    content: "{{ ca_cert_sign[item] }}"
+    content: "{{ openssl_node_ca_cert_sign[item] }}"
     dest: "{{ openssl_node.local_tmp }}/{{ item }}"
   become: no
   with_items: ['ca_pub_key', 'ca_priv_key']
