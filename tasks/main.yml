@@ -1,4 +1,10 @@
 ---
+- include: packages.yml
+  when: (not openssl_certs_stat.results[0].stat.exists or
+        not openssl_certs_stat.results[1].stat.exists) and
+        not openssl_node_only_ca
+  tags: ['packages']
+
 - set_fact:
     privkey_dst: "{{ openssl_node.priv_dst }}/{{ openssl_node.name }}-key.pem"
     pubkey_dst: "{{ openssl_node.pub_dst }}/{{ openssl_node.name }}.pem"
@@ -19,12 +25,6 @@
 - name: Update system CA store
   command: update-ca-certificates
   when: copy_ca_certs.changed
-
-- include: packages.yml
-  when: (not openssl_certs_stat.results[0].stat.exists or
-        not openssl_certs_stat.results[1].stat.exists) and
-        not openssl_node_only_ca
-  tags: ['packages']
 
 - include: signed-cert.yml
   when: (not openssl_certs_stat.results[0].stat.exists or
