@@ -1,5 +1,5 @@
 ---
-just_ca_pub: false
+openssl_node_only_ca: false
 openssl_node_bit_length: 4096
 openssl_node_name: "{{ ansible_fqdn }}"
 openssl_node_expiration: 365
@@ -19,7 +19,7 @@ openssl_node_pkgs:
 openssl_node_ca:
   use: default_ca_name
 
-ca_cert:
+openssl_ca_cert_details:
   city: San Francisco
   state: CA
   country: US
@@ -30,7 +30,7 @@ ca_cert:
 # This is a NON-PRODUCTION Test CA utilized for testing purposes.
 # In production you should have these values stored in your ansible
 # vault. Password is `test_ca` for the encrypted private key below.
-certificate_authority:
+openssl_node_certificate_authority:
   testca_freedom_press:
     pub: |
       -----BEGIN CERTIFICATE-----
@@ -119,6 +119,6 @@ certificate_authority:
       3iM=
       -----END ENCRYPTED PRIVATE KEY-----
 
-ca_cert_sign:
-  ca_pub_key: "{{ certificate_authority[openssl_node_ca_name].pub }}"
-  ca_priv_key: "{{ certificate_authority[openssl_node_ca_name].private }}"
+openssl_node_ca_cert_sign:
+  ca_pub_key: "{{ openssl_node_certificate_authority[openssl_node_ca_name].pub }}"
+  ca_priv_key: "{{ openssl_node_certificate_authority[openssl_node_ca_name].private }}"

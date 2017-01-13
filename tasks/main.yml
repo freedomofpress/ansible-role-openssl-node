@@ -8,12 +8,12 @@
     path: "{{ item }}"
     get_checksum: false
   with_items: ["{{ privkey_dst }}", "{{ pubkey_dst }}"]
-  register: openssl_certs
+  register: openssl_certs_stat
 
 - name: Lay-down public CA key
   copy:
     dest: "/usr/local/share/ca-certificates/{{ openssl_node_ca_name }}.crt"
-    content: "{{ ca_cert_sign.ca_pub_key }}"
+    content: "{{ openssl_node_ca_cert_sign.ca_pub_key }}"
   register: copy_ca_certs
 
 - name: Update system CA store
@@ -21,13 +21,13 @@
   when: copy_ca_certs.changed
 
 - include: packages.yml
-  when: (not openssl_certs.results[0].stat.exists or
-        not openssl_certs.results[1].stat.exists) and
-        not just_ca_pub
+  when: (not openssl_certs_stat.results[0].stat.exists or
+        not openssl_certs_stat.results[1].stat.exists) and
+        not openssl_node_only_ca
   tags: ['packages']
 
 - include: signed-cert.yml
-  when: (not openssl_certs.results[0].stat.exists or
-        not openssl_certs.results[1].stat.exists) and
-        not just_ca_pub
+  when: (not openssl_certs_stat.results[0].stat.exists or
+        not openssl_certs_stat.results[1].stat.exists) and
+        not openssl_node_only_ca
   tags: ['generate']

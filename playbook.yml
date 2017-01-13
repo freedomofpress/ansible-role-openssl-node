@@ -1,0 +1,9 @@
+---
+
+- name: Distribute public CA and generate server key-pair
+  hosts: all
+  gather_facts: yes
+  become: yes
+  roles:
+    - role: ansible-role-openssl-node
+

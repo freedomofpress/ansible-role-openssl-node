@@ -76,28 +76,28 @@ string_mask = utf8only
 
 [ req_distinguished_name ]
 countryName			= Country Name (2 letter code)
-countryName_default		= {{ ca_cert.country }}
+countryName_default		= {{ openssl_ca_cert_details.country }}
 countryName_min			= 2
 countryName_max			= 2
 
 stateOrProvinceName		= State or Province Name (full name)
-stateOrProvinceName_default	= {{ ca_cert.state }}
+stateOrProvinceName_default	= {{ openssl_ca_cert_details.state }}
 
 localityName			= Locality Name (eg, city)
-localityName_default		= {{ ca_cert.city }}
+localityName_default		= {{ openssl_ca_cert_details.city }}
 
 0.organizationName		= Organization Name (eg, company)
-0.organizationName_default	= {{ ca_cert.org }}
+0.organizationName_default	= {{ openssl_ca_cert_details.org }}
 
 organizationalUnitName		= Organizational Unit Name (eg, section)
-organizationalUnitName_default	= {{ ca_cert.ou }}
+organizationalUnitName_default	= {{ openssl_ca_cert_details.ou }}
 
 commonName			= Common Name (e.g. server FQDN or YOUR name)
 commonName_max			= 64
 
 emailAddress			= Email Address
 emailAddress_max		= 64
-emailAddress_default		= {{ ca_cert.email }}
+emailAddress_default		= {{ openssl_ca_cert_details.email }}
 
 [ req_attributes ]
 challengePassword		= A challenge password
