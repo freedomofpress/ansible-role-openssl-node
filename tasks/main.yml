@@ -1,8 +1,5 @@
 ---
 - include: packages.yml
-  when: (not openssl_certs_stat.results[0].stat.exists or
-        not openssl_certs_stat.results[1].stat.exists) and
-        not openssl_node_only_ca
   tags: ['packages']
 
 - set_fact:
