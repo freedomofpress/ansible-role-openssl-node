@@ -18,7 +18,9 @@ openssl_node:
   bit_length: "{{ openssl_node_bit_length }}"
   pub_dst: /etc/ssl/certs
   priv_dst: /etc/ssl/private
-  local_tmp: "./tmp/{{ ansible_fqdn }}"
+  local_ca_dir: "./tmp/{{ ansible_fqdn }}"
+
+openssl_node_conf: "{{ openssl_node.local_ca_dir }}/openssl.cnf"
 
 openssl_node_pkgs:
   - ca-certificates
