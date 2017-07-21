@@ -5,6 +5,7 @@
 - set_fact:
     privkey_dst: "{{ openssl_node.priv_dst }}/{{ openssl_node.name }}-key.pem"
     pubkey_dst: "{{ openssl_node.pub_dst }}/{{ openssl_node.name }}.pem"
+  tags: always
 
 - name: Check if certs already exists
   stat:
@@ -12,6 +13,7 @@
     get_checksum: false
   with_items: ["{{ privkey_dst }}", "{{ pubkey_dst }}"]
   register: openssl_certs_stat
+  tags: always
 
 - name: Lay-down public CA key
   copy:
