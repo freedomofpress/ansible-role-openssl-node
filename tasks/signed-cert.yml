@@ -33,7 +33,7 @@
 - name: Expand CA certs
   local_action:
     module: copy
-    content: "{{ ca_cert_sign[item.key_name] }}"
+    content: "{{ openssl_node_ca_cert_sign[item.key_name] }}"
     dest: "{{ item.dest }}"
   become: no
   with_items:

@@ -18,7 +18,7 @@
 - name: Lay-down public CA key
   copy:
     dest: "{{ openssl_node_pub_ca_dir }}/{{ openssl_node_ca_name }}.crt"
-    content: "{{ ca_cert_sign.ca_pub_key }}"
+    content: "{{ openssl_node_ca_cert_sign.ca_pub_key }}"
   register: copy_ca_certs
 
 - name: Update system CA store
