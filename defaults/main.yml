@@ -6,6 +6,8 @@ openssl_node_expiration: 365
 openssl_node_ca_name: "testca_freedom_press"
 openssl_node_ca_creds: "test_ca"
 
+openssl_node_pub_ca_dir: /usr/local/share/ca-certificates/
+
 openssl_node:
   name: "{{ openssl_node_name }}"
   bit_length: "{{ openssl_node_bit_length }}"
