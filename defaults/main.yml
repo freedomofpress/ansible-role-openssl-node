@@ -8,6 +8,11 @@ openssl_node_ca_creds: "test_ca"
 
 openssl_node_pub_ca_dir: /usr/local/share/ca-certificates/
 
+# If you are using this role just for cert signing without revocation needs you
+# dont have to maintain those locally and can purge the private key from the
+# system post CSR signature
+openssl_node_ca_destroy: true
+
 openssl_node:
   name: "{{ openssl_node_name }}"
   bit_length: "{{ openssl_node_bit_length }}"

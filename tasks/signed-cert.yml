@@ -70,4 +70,5 @@
 - name: Clean-up
   shell: "shred -u -z {{ openssl_node.local_tmp }}/*"
   delegate_to: localhost
+  when: openssl_node_ca_destroy
   become: no
