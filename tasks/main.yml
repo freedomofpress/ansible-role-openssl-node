@@ -24,7 +24,7 @@
 - name: Update system CA store
   command: update-ca-certificates
   when:
-    - copy_ca_certs.changed
+    - copy_ca_certs|changed
     - openssl_node_pub_ca_dir == "/usr/local/share/ca-certificates/"
 
 - include: signed-cert.yml
