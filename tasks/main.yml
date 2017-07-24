@@ -5,6 +5,7 @@
 - set_fact:
     privkey_dst: "{{ openssl_node.priv_dst }}/{{ openssl_node.name }}-key.pem"
     pubkey_dst: "{{ openssl_node.pub_dst }}/{{ openssl_node.name }}.pem"
+  tags: always
 
 - name: Check if certs already exists
   stat:
@@ -12,16 +13,19 @@
     get_checksum: false
   with_items: ["{{ privkey_dst }}", "{{ pubkey_dst }}"]
   register: openssl_certs_stat
+  tags: always
 
 - name: Lay-down public CA key
   copy:
-    dest: "/usr/local/share/ca-certificates/{{ openssl_node_ca_name }}.crt"
+    dest: "{{ openssl_node_pub_ca_dir }}/{{ openssl_node_ca_name }}.crt"
     content: "{{ openssl_node_ca_cert_sign.ca_pub_key }}"
   register: copy_ca_certs
 
 - name: Update system CA store
   command: update-ca-certificates
-  when: copy_ca_certs.changed
+  when:
+    - copy_ca_certs|changed
+    - openssl_node_pub_ca_dir == "/usr/local/share/ca-certificates/"
 
 - include: signed-cert.yml
   when: (not openssl_certs_stat.results[0].stat.exists or

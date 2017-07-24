@@ -1,40 +1,52 @@
 ---
 - set_fact:
-    certconf_tmp: "{{ ansible_env.TMPDIR | default('/tmp') }}/openssl_node.cnf"
     csr: "{{openssl_node.name}}-req.csr"
     pub_key: "/tmp/{{openssl_node.name}}-pub.pem"
+    remote_certconf_temp: "/tmp/openssl.cnf"
+  tags: always
 
 - name: Spin out remote openssl conf
   template:
     src: openssl.cnf.j2
-    dest: "{{ certconf_tmp }}"
+    dest: "{{ remote_certconf_temp }}"
 
-- name: Ensure local tmp exists
+- name: Ensure local CA dirs exists
   local_action:
     module: file
     state: directory
-    path: "{{ openssl_node.local_tmp }}"
+    path: "{{ item }}"
+  with_items:
+    - "{{ openssl_node.local_ca_dir }}"
+    - "{{ openssl_node.local_ca_dir }}/certs"
+    - "{{ openssl_node.local_ca_dir }}/newcerts"
+    - "{{ openssl_node.local_ca_dir }}/private"
+    - "{{ openssl_node.local_ca_dir }}/csr"
   become: no
 
-- name: Spin out local openssl conf
-  fetch:
-    src: "{{ certconf_tmp }}"
-    dest: "{{ certconf_tmp }}"
-    flat: yes
+- name: Spin out local openssl conf if doesnt exist
+  template:
+    src: openssl.cnf.j2
+    dest: "{{ openssl_node_conf }}"
+    force: no
+  delegate_to: localhost
 
-- name: Temporarily expand CA cert
+- name: Expand CA certs
   local_action:
     module: copy
-    content: "{{ openssl_node_ca_cert_sign[item] }}"
-    dest: "{{ openssl_node.local_tmp }}/{{ item }}"
+    content: "{{ openssl_node_ca_cert_sign[item.key_name] }}"
+    dest: "{{ item.dest }}"
   become: no
-  with_items: ['ca_pub_key', 'ca_priv_key']
+  with_items:
+    - key_name: 'ca_pub_key'
+      dest: "{{ openssl_node.local_ca_dir }}/cacert.pem"
+    - key_name: 'ca_priv_key'
+      dest: "{{ openssl_node.local_ca_dir }}/private/cakey.pem"
   no_log: true
 
 - name: create CSR req
   command: >
     openssl req -new -nodes -out /tmp/{{ csr }}
-    -keyout {{privkey_dst}} -config {{ certconf_tmp }} -batch
+    -keyout {{ privkey_dst }} -config {{ remote_certconf_temp }} -batch
     -newkey rsa:{{ openssl_node.bit_length }}
     -subj '/CN={{openssl_node.name}}'
   args:
@@ -44,30 +56,53 @@
 - name: Pull back the CSR to local machine
   fetch:
     src: "/tmp/{{ csr }}"
-    dest: "{{ openssl_node.local_tmp}}/{{ csr }}"
+    dest: "{{ openssl_node.local_ca_dir }}/csr/{{ csr }}"
     flat: yes
+  tags: fetch
 
-- name: sign csr
+- name: Check for existence of crl list
+  stat:
+    path: "{{ openssl_node.local_ca_dir }}/crl.pem"
+  register: crl_check_result
+  tags: always
+
+- name: Sign CSR using disposable CA environment
   command: >
-    openssl x509 -req -in {{ openssl_node.local_tmp }}/{{ csr }}
-    -CA {{ openssl_node.local_tmp }}/ca_pub_key
-    -CAkey {{ openssl_node.local_tmp }}/ca_priv_key
-    -out {{ openssl_node.local_tmp }}/signed_pub
+    openssl x509 -req -in {{ openssl_node.local_ca_dir }}/csr/{{ csr }}
+    -CA {{ openssl_node.local_ca_dir }}/cacert.pem
+    -CAkey {{ openssl_node.local_ca_dir }}/private/cakey.pem
+    -out {{ openssl_node.local_ca_dir }}/newcerts/{{ openssl_node.name }}.pem
     -set_serial {{ lookup('pipe', "date +'%s'") }}
     -days {{ openssl_node_expiration }} -extensions v3_req
-    -extfile {{ certconf_tmp }} -passin pass:{{ openssl_node_ca_creds }}
+    -extfile {{ openssl_node_conf }} -passin pass:{{ openssl_node_ca_creds }}
   delegate_to: localhost
   args:
-    creates: "{{ openssl_node.local_tmp }}/signed_pub"
+    creates: "{{ openssl_node.local_ca_dir }}/newcerts/{{ openssl_node.name }}.pem"
+    chdir: "{{ openssl_node.local_ca_dir }}"
+  when: not crl_check_result.stat.exists
   become: no
   no_log: true
 
+- name: Sign CSR under static CA environment
+  command: >
+    openssl ca -batch -config {{ openssl_node_conf }}
+    -in {{ openssl_node.local_ca_dir }}/csr/{{ csr }}
+    -out {{ openssl_node.local_ca_dir }}/newcerts/{{ openssl_node.name }}.pem
+    -passin pass:{{ openssl_node_ca_creds }}
+  delegate_to: localhost
+  args:
+    creates: "{{ openssl_node.local_ca_dir }}/newcerts/{{ openssl_node.name }}.pem"
+    chdir: "{{ openssl_node.local_ca_dir }}"
+  when: crl_check_result.stat.exists
+  become: no
+
 - name: Copy over signed cert to destination
   copy:
-    src: "{{ openssl_node.local_tmp }}/signed_pub"
+    src: "{{ openssl_node.local_ca_dir }}/newcerts/{{ openssl_node.name }}.pem"
     dest: "{{ pubkey_dst }}"
 
-- name: Clean-up
-  shell: "shred -u -z {{ openssl_node.local_tmp }}/*"
+- name: Clean-up private CA key
+  shell: "shred -u -z {{ openssl_node.local_ca_dir }}/private/*"
   delegate_to: localhost
+  when: openssl_node_ca_destroy
   become: no
