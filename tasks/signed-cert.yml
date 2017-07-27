@@ -24,6 +24,7 @@
   become: no
 
 - name: Spin out local openssl conf if doesnt exist
+  become: no
   template:
     src: openssl.cnf.j2
     dest: "{{ openssl_node_conf }}"
@@ -68,13 +69,13 @@
 
 - name: Sign CSR using disposable CA environment
   command: >
-    openssl x509 -req -in {{ openssl_node.local_ca_dir }}/csr/{{ csr }}
-    -CA {{ openssl_node.local_ca_dir }}/cacert.pem
-    -CAkey {{ openssl_node.local_ca_dir }}/private/cakey.pem
-    -out {{ openssl_node.local_ca_dir }}/newcerts/{{ openssl_node.name }}.pem
+    openssl x509 -req -in csr/{{ csr }}
+    -CA cacert.pem
+    -CAkey private/cakey.pem
+    -out newcerts/{{ openssl_node.name }}.pem
     -set_serial {{ lookup('pipe', "date +'%s'") }}
     -days {{ openssl_node_expiration }} -extensions v3_req
-    -extfile {{ openssl_node_conf }} -passin pass:{{ openssl_node_ca_creds }}
+    -extfile openssl.cnf -passin pass:{{ openssl_node_ca_creds }}
   delegate_to: localhost
   args:
     creates: "{{ openssl_node.local_ca_dir }}/newcerts/{{ openssl_node.name }}.pem"
