@@ -54,6 +54,13 @@
     creates: "{{ privkey_dst }}"
   register: create_csr
 
+- name: Set private key perms
+  file:
+    path: "{{ privkey_dst }}"
+    owner: "{{ openssl_node_priv_owner }}"
+    group: "{{ openssl_node_priv_group }}"
+    mode: "{{ openssl_node_priv_mode }}"
+
 - name: Pull back the CSR to local machine
   fetch:
     src: "/tmp/{{ csr }}"
