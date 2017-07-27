@@ -13,11 +13,17 @@ openssl_node_pub_ca_dir: /usr/local/share/ca-certificates/
 # system post CSR signature
 openssl_node_ca_destroy: true
 
+openssl_node_pub_dst: /etc/ssl/certs
+openssl_node_priv_dst: /etc/ssl/private
+openssl_node_priv_owner: root
+openssl_node_priv_group: root
+openssl_node_priv_mode: 0600
+
 openssl_node:
   name: "{{ openssl_node_name }}"
   bit_length: "{{ openssl_node_bit_length }}"
-  pub_dst: /etc/ssl/certs
-  priv_dst: /etc/ssl/private
+  pub_dst: "{{ openssl_node_pub_dst }}"
+  priv_dst: "{{ openssl_node_priv_dst }}"
   local_ca_dir: "./tmp/{{ ansible_fqdn }}"
 
 openssl_node_conf: "{{ openssl_node.local_ca_dir }}/openssl.cnf"
