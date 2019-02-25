@@ -50,8 +50,6 @@
     -keyout {{ privkey_dst }} -config {{ remote_certconf_temp }} -batch
     -newkey rsa:{{ openssl_node.bit_length }}
     -subj '/CN={{openssl_node.name}}'
-  args:
-    creates: "{{ privkey_dst }}"
   register: create_csr
 
 - name: Set private key perms
