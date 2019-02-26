@@ -1,6 +1,6 @@
 ---
 - include: packages.yml
-  tags: ['packages']
+  tags: ["packages"]
 
 - set_fact:
     privkey_dst: "{{ openssl_node.priv_dst }}/{{ openssl_node.name }}-key.pem"
