@@ -38,9 +38,9 @@
     dest: "{{ item.dest }}"
   become: no
   with_items:
-    - key_name: 'ca_pub_key'
+    - key_name: "ca_pub_key"
       dest: "{{ openssl_node.local_ca_dir }}/cacert.pem"
-    - key_name: 'ca_priv_key'
+    - key_name: "ca_priv_key"
       dest: "{{ openssl_node.local_ca_dir }}/private/cakey.pem"
   no_log: true
 
@@ -50,8 +50,6 @@
     -keyout {{ privkey_dst }} -config {{ remote_certconf_temp }} -batch
     -newkey rsa:{{ openssl_node.bit_length }}
     -subj '/CN={{openssl_node.name}}'
-  args:
-    creates: "{{ privkey_dst }}"
   register: create_csr
 
 - name: Set private key perms

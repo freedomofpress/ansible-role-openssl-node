@@ -2,7 +2,7 @@
 openssl_node_only_ca: false
 openssl_node_bit_length: 4096
 openssl_node_name: "{{ ansible_fqdn }}"
-openssl_node_expiration: 365
+openssl_node_expiration: 730
 openssl_node_ca_name: "testca_freedom_press"
 openssl_node_ca_creds: "test_ca"
 
@@ -138,3 +138,7 @@ openssl_node_certificate_authority:
 openssl_node_ca_cert_sign:
   ca_pub_key: "{{ openssl_node_certificate_authority[openssl_node_ca_name].pub }}"
   ca_priv_key: "{{ openssl_node_certificate_authority[openssl_node_ca_name].private }}"
+
+# Set this to true to force the role to recreate a key. This is normally
+# ill-advised and only to be used if a key has expired.
+openssl_force_resign: false
