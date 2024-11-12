@@ -1,5 +1,5 @@
 ---
-- include_tasks: packages.yml
+- ansible.builtin.include_tasks: packages.yml
   tags: ["packages"]
 
 - set_fact:
