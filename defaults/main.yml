@@ -1,7 +1,7 @@
 ---
 openssl_node_only_ca: false
 openssl_node_bit_length: 4096
-openssl_node_name: "{{ ansible_fqdn }}"
+openssl_node_name: "{{ ansible_facts['fqdn'] }}"
 openssl_node_expiration: 730
 openssl_node_ca_name: "testca_freedom_press"
 openssl_node_ca_creds: "test_ca"
@@ -24,7 +24,7 @@ openssl_node:
   bit_length: "{{ openssl_node_bit_length }}"
   pub_dst: "{{ openssl_node_pub_dst }}"
   priv_dst: "{{ openssl_node_priv_dst }}"
-  local_ca_dir: "./tmp/{{ ansible_fqdn }}"
+  local_ca_dir: "./tmp/{{ ansible_facts['fqdn'] }}"
 
 openssl_node_conf: "{{ openssl_node.local_ca_dir }}/openssl.cnf"
 
